@@ -1,6 +1,6 @@
 # mopl
 
-Easily install Camunda Desktop Modeler plugins.
+Easily install [Camunda Desktop Modeler plugins](https://github.com/camunda/camunda-modeler-plugins).
 
 ## Installation
 
@@ -15,6 +15,11 @@ cd mopl/
 bin/mopl -h
 # [mopl] Usage: mopl -hv
 ```
+
+## Additional Resources
+
+* [Plugins documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/plugins/)
+* [Plugins list](https://github.com/camunda/camunda-modeler-plugins)
 
 ## License
 
