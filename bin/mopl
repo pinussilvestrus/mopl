@@ -1,0 +1,89 @@
+#!/opt/homebrew/bin/bash
+# ------------------------------------------------------------------
+#title           :mopl
+#description     :Easily install Camunda Desktop Modeler plugins.
+#author          :Niklas Kiefer
+#usage           :mopl -hv
+#bash-version    :Bash v4
+# ------------------------------------------------------------------
+
+VERSION=0.1.0
+USAGE="Usage: mopl -hv"
+
+# TODO(pinussilvestrus): make path configurable
+# TODO(pinussilvestrus): make cross platform
+PLUGINS_PATH="${HOME}/Library/Application Support/camunda-modeler/resources/plugins"
+
+set -Eeuo pipefail
+
+printMsg() {
+  echo "[mopl] $1"
+}
+
+# get args
+while getopts ":vh" optname
+  do
+    case "$optname" in
+      "v")
+        printMsg "Version $VERSION"
+        exit 0;
+        ;;
+      "h")
+        printMsg "$USAGE"
+        exit 0;
+        ;;
+      "?")
+        printMsg "Unknown option $OPTARG"
+        exit 0;
+        ;;
+      ":")
+        printMsg "No argument value for option $OPTARG"
+        exit 0;
+        ;;
+      *)
+        printMsg "Unknown error while processing options"
+        exit 0;
+        ;;
+    esac
+  done
+
+# crawl plugins
+# TODO(pinussilvestrus): also offer local plugins, as https://github.com/camunda/camunda-modeler-plugins/tree/master/camunda-transaction-boundaries-plugin
+repo='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
+md_link_regex='^\*(\s)*\[.*?\]\((https:\/\/.*?).*?\)'
+url_regex='(https:\/\/.*?)\)'
+
+printMsg "Crawling plugins from camunda/camunda-modeler-plugins..."
+raw_plugins=$(curl --silent "$repo" | grep -Eo "${md_link_regex}")
+
+# define plugins struct
+plugin_urls=($(echo "${raw_plugins}" | grep -Eo "${url_regex}"))
+plugins=()
+
+for (( i=0; i<${#plugin_urls[@]}; i++ ));
+do
+  # TODO(pinussilvestrus): also retrieve correct package name (not only URLs) 
+  plugins[$i]=${plugin_urls[$i]::-1} # remove last char
+done
+
+# prompt available plugins
+# TODO(pinussilvestrus): make keyboard accessible
+printMsg "Available plugins to install:"
+
+PS3='Select number: '
+select opt in "${plugins[@]}"
+do
+  if  [ -z "$opt" ]; then
+    printMsg "invalid option"
+  else
+    break
+  fi
+done
+
+# download plugin
+# TODO(pinussilvestrus): make version configurable
+plugin_download_url="${opt}/tarball/master"
+printMsg "Downloading from ${plugin_download_url}..."
+curl --silent -L "${plugin_download_url}" | tar zx -C "$PLUGINS_PATH"
+
+printMsg "Success!"
