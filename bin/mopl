@@ -13,11 +13,51 @@ USAGE="Usage: mopl -hv"
 # TODO(pinussilvestrus): make path configurable
 # TODO(pinussilvestrus): make cross platform
 PLUGINS_PATH="${HOME}/Library/Application Support/camunda-modeler/resources/plugins"
+PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
+URL_REGEX='(https:\/\/.*?)\)'
+MD_LINK_REGEX='^\*(\s)*\[.*?\]\((https:\/\/.*?).*?\)'
 
 set -Eeuo pipefail
 
-printMsg() {
+function print_message {
   echo "[mopl] $1"
+}
+
+# TODO(pinussilvestrus): also offer local plugins, as https://github.com/camunda/camunda-modeler-plugins/tree/master/camunda-transaction-boundaries-plugin
+function crawl_plugins {
+  curl --silent "$PLUGINS_REPOSITORY" | grep -Eo "${MD_LINK_REGEX}"
+}
+
+plugins=()
+function transform_plugins {
+  plugin_urls=($(echo "$1" | grep -Eo "${URL_REGEX}"))
+
+  for (( i=0; i<${#plugin_urls[@]}; i++ ));
+  do
+    # TODO(pinussilvestrus): also retrieve correct package name (not only URLs) 
+    plugins[$i]=${plugin_urls[$i]::-1} # remove last char
+  done
+}
+
+# TODO(pinussilvestrus): make keyboard accessible
+function select_plugin {
+  PS3='Select number: '
+  select opt in "${plugins[@]}"
+  do
+    if  [ -z "$opt" ]; then
+      print_message "invalid option"
+    else
+      break
+    fi
+  done
+
+  echo "$opt"
+}
+
+# TODO(pinussilvestrus): make version configurable
+function download_plugin {
+  plugin_download_url="${1}/tarball/master"
+  curl --silent -L "${plugin_download_url}" | tar zx -C "$PLUGINS_PATH"
 }
 
 # get args
@@ -25,65 +65,40 @@ while getopts ":vh" optname
   do
     case "$optname" in
       "v")
-        printMsg "Version $VERSION"
+        print_message "Version $VERSION"
         exit 0;
         ;;
       "h")
-        printMsg "$USAGE"
+        print_message "$USAGE"
         exit 0;
         ;;
       "?")
-        printMsg "Unknown option $OPTARG"
+        print_message "Unknown option $OPTARG"
         exit 0;
         ;;
       ":")
-        printMsg "No argument value for option $OPTARG"
+        print_message "No argument value for option $OPTARG"
         exit 0;
         ;;
       *)
-        printMsg "Unknown error while processing options"
+        print_message "Unknown error while processing options"
         exit 0;
         ;;
     esac
   done
 
 # crawl plugins
-# TODO(pinussilvestrus): also offer local plugins, as https://github.com/camunda/camunda-modeler-plugins/tree/master/camunda-transaction-boundaries-plugin
-repo='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
-md_link_regex='^\*(\s)*\[.*?\]\((https:\/\/.*?).*?\)'
-url_regex='(https:\/\/.*?)\)'
-
-printMsg "Crawling plugins from camunda/camunda-modeler-plugins..."
-raw_plugins=$(curl --silent "$repo" | grep -Eo "${md_link_regex}")
+print_message "Crawling plugins from camunda/camunda-modeler-plugins..."
+raw_plugins=$(crawl_plugins)
 
 # define plugins struct
-plugin_urls=($(echo "${raw_plugins}" | grep -Eo "${url_regex}"))
-plugins=()
-
-for (( i=0; i<${#plugin_urls[@]}; i++ ));
-do
-  # TODO(pinussilvestrus): also retrieve correct package name (not only URLs) 
-  plugins[$i]=${plugin_urls[$i]::-1} # remove last char
-done
+transform_plugins "${raw_plugins}"
 
 # prompt available plugins
-# TODO(pinussilvestrus): make keyboard accessible
-printMsg "Available plugins to install:"
-
-PS3='Select number: '
-select opt in "${plugins[@]}"
-do
-  if  [ -z "$opt" ]; then
-    printMsg "invalid option"
-  else
-    break
-  fi
-done
+print_message "Available plugins to install:"
+opt=$(select_plugin)
 
 # download plugin
-# TODO(pinussilvestrus): make version configurable
-plugin_download_url="${opt}/tarball/master"
-printMsg "Downloading from ${plugin_download_url}..."
-curl --silent -L "${plugin_download_url}" | tar zx -C "$PLUGINS_PATH"
-
-printMsg "Success!"
+print_message "Downloading from ${opt}/tarball/master..."
+download_plugin "$opt"
+print_message "Success!"
