@@ -15,7 +15,7 @@ USAGE="Usage: mopl -hv"
 PLUGINS_PATH="${HOME}/Library/Application Support/camunda-modeler/resources/plugins"
 PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
 URL_REGEX='(https:\/\/.*?)\)'
-MD_LINK_REGEX='^\*(\s)*\[.*?\]\((https:\/\/.*?).*?\)'
+MD_LINK_REGEX='^\*(\s)*\[.*?\]\(((https:\/\/.*?)|.).*?\)'
 PLUGINS_BLACKLIST=('https://docs.camunda.io/docs/components/modeler/desktop-modeler/plugins/')
 
 set -Eeuo pipefail
