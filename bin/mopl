@@ -29,8 +29,9 @@ function crawl_plugins {
   curl --silent "$PLUGINS_REPOSITORY" | grep -Eo "${MD_LINK_REGEX}"
 }
 
-plugins=()
-# TODO(pinussilvestrus): also retrieve correct package name (not only URLs) 
+declare -A plugins
+# populates <plugins> in the following structure:
+# [key]: url
 function transform_plugins {
   plugin_urls=($(echo "$1" | grep -Eo "${URL_REGEX}"))
 
@@ -50,14 +51,22 @@ function transform_plugins {
 
   # set to data struct
   for i in "${!plugin_urls[@]}"; do
-    plugins[$i]=${plugin_urls[$i]}
+    key=($(echo "${plugin_urls[$i]}" | grep -Eo '([^\/]+$)'))
+    plugins[$key]=${plugin_urls[$i]}
   done
 }
 
 # TODO(pinussilvestrus): make keyboard accessible
 function select_plugin {
+  options=()
+
+  for key in "${!plugins[@]}"
+  do
+    options+=("$key")
+  done
+
   PS3='Select number: '
-  select opt in "${plugins[@]}"
+  select opt in "${options[@]}" 
   do
     if  [ -z "$opt" ]; then
       print_message "invalid option"
@@ -66,7 +75,7 @@ function select_plugin {
     fi
   done
 
-  echo "$opt"
+  echo "${plugins[$opt]}"
 }
 
 # TODO(pinussilvestrus): make version configurable
