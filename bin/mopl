@@ -11,8 +11,6 @@ VERSION=0.1.0
 USAGE="Usage: mopl -hvn"
 
 # TODO(pinussilvestrus): make path configurable
-# TODO(pinussilvestrus): make cross platform
-PLUGINS_PATH="${HOME}/Library/Application Support/camunda-modeler/resources/plugins"
 PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
 URL_REGEX='(https:\/\/.*?)\)'
 MD_LINK_REGEX='^\*(\s)*\[.*?\]\(((https:\/\/.*?)|.).*?\)'
@@ -27,6 +25,43 @@ function print_message {
 # TODO(pinussilvestrus): also offer local plugins, as https://github.com/camunda/camunda-modeler-plugins/tree/master/camunda-transaction-boundaries-plugin
 function crawl_plugins {
   curl --silent "$PLUGINS_REPOSITORY" | grep -Eo "${MD_LINK_REGEX}"
+}
+
+function platform {
+  os
+  platform
+
+  os=$(uname -s)
+  case "$os" in
+  Darwin)
+    platform="mac"
+    ;;
+  Linux)
+    platform="linux"
+    ;;
+  *)
+    fail "Unknown OS: $os"
+    ;;
+  esac
+
+  echo "$platform"
+}
+
+# TODO(pinussilvestrus): make cross platform
+function get_plugins_path {
+  platform_name="$(platform)"
+
+  case "$platform_name" in
+  mac)
+    echo "${HOME}/Library/Application Support/camunda-modeler/resources/plugins"
+    ;;
+  linux)
+    echo "${HOME}/.config"
+    ;;
+  *)
+    fail "Unknown platform: $platform_name"
+    ;;
+  esac
 }
 
 declare -A plugins
@@ -82,7 +117,8 @@ function select_plugin {
 function download_plugin {
   print_message "Downloading from ${opt}/tarball/master..."
   plugin_download_url="${1}/tarball/master"
-  curl --silent -L "${plugin_download_url}" | tar zx -C "$PLUGINS_PATH"
+  plugins_path=$(get_plugins_path)
+  curl --silent -L "${plugin_download_url}" | tar zx -C "$plugins_path"
   print_message "Success!"
 }
 
