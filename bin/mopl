@@ -16,6 +16,7 @@ PLUGINS_PATH="${HOME}/Library/Application Support/camunda-modeler/resources/plug
 PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
 URL_REGEX='(https:\/\/.*?)\)'
 MD_LINK_REGEX='^\*(\s)*\[.*?\]\((https:\/\/.*?).*?\)'
+PLUGINS_BLACKLIST=('https://docs.camunda.io/docs/components/modeler/desktop-modeler/plugins/')
 
 set -Eeuo pipefail
 
@@ -29,13 +30,27 @@ function crawl_plugins {
 }
 
 plugins=()
+# TODO(pinussilvestrus): also retrieve correct package name (not only URLs) 
 function transform_plugins {
   plugin_urls=($(echo "$1" | grep -Eo "${URL_REGEX}"))
 
-  for (( i=0; i<${#plugin_urls[@]}; i++ ));
-  do
-    # TODO(pinussilvestrus): also retrieve correct package name (not only URLs) 
-    plugins[$i]=${plugin_urls[$i]::-1} # remove last char
+  # remove last char ")"
+  for (( i=0; i<${#plugin_urls[@]}; i++ )); do
+    plugin_urls[$i]=${plugin_urls[$i]::-1} # remove last char
+  done
+
+  # remove blacklist items
+  for del in "${PLUGINS_BLACKLIST[@]}"; do
+    for i in "${!plugin_urls[@]}"; do
+      if [[ ${plugin_urls[i]} = $del ]]; then
+        unset 'plugin_urls[i]'
+      fi
+    done
+  done
+
+  # set to data struct
+  for i in "${!plugin_urls[@]}"; do
+    plugins[$i]=${plugin_urls[$i]}
   done
 }
 
