@@ -16,6 +16,10 @@ bin/mopl -h
 # [mopl] Usage: mopl -hv
 ```
 
+```sh
+bin/mopl -n bpmn-js-token-simulation-plugin
+```
+
 ## Additional Resources
 
 * [Plugins documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/plugins/)

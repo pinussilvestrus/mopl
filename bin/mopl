@@ -3,12 +3,12 @@
 #title           :mopl
 #description     :Easily install Camunda Desktop Modeler plugins.
 #author          :Niklas Kiefer
-#usage           :mopl -hv
+#usage           :mopl -hvn
 #bash-version    :Bash v4
 # ------------------------------------------------------------------
 
 VERSION=0.1.0
-USAGE="Usage: mopl -hv"
+USAGE="Usage: mopl -hvn"
 
 # TODO(pinussilvestrus): make path configurable
 # TODO(pinussilvestrus): make cross platform
@@ -80,12 +80,14 @@ function select_plugin {
 
 # TODO(pinussilvestrus): make version configurable
 function download_plugin {
+  print_message "Downloading from ${opt}/tarball/master..."
   plugin_download_url="${1}/tarball/master"
   curl --silent -L "${plugin_download_url}" | tar zx -C "$PLUGINS_PATH"
+  print_message "Success!"
 }
 
 # get args
-while getopts ":vh" optname
+while getopts ":n:vh" optname
   do
     case "$optname" in
       "v")
@@ -95,6 +97,9 @@ while getopts ":vh" optname
       "h")
         print_message "$USAGE"
         exit 0;
+        ;;
+      "n")
+        arg_plugin_name=$OPTARG
         ;;
       "?")
         print_message "Unknown option $OPTARG"
@@ -118,11 +123,18 @@ raw_plugins=$(crawl_plugins)
 # define plugins struct
 transform_plugins "${raw_plugins}"
 
-# prompt available plugins
+# a) install given plugin
+if [[ -v arg_plugin_name ]]; then
+  if [[ -v "plugins[$arg_plugin_name]" ]]; then
+    opt="${plugins[$arg_plugin_name]}"
+    download_plugin "$opt"
+    exit 0;
+  else
+    print_message "Plugin <${arg_plugin_name}> not found."
+  fi
+fi
+
+# b) prompt available plugins
 print_message "Available plugins to install:"
 opt=$(select_plugin)
-
-# download plugin
-print_message "Downloading from ${opt}/tarball/master..."
 download_plugin "$opt"
-print_message "Success!"
