@@ -2,6 +2,8 @@
 
 Easily install [Camunda Desktop Modeler plugins](https://github.com/camunda/camunda-modeler-plugins).
 
+![Screenshot](./docs/screenshot.png)
+
 ## Requirements
 
 * Bash 4
