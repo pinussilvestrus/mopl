@@ -3,12 +3,12 @@
 #title           :mopl
 #description     :Easily install Camunda Desktop Modeler plugins.
 #author          :Niklas Kiefer
-#usage           :mopl -hvn
+#usage           :mopl -hvnl
 #bash-version    :Bash v4
 # ------------------------------------------------------------------
 
 VERSION=0.1.0
-USAGE="Usage: mopl -hvn"
+USAGE="Usage: mopl -hvnl"
 
 # TODO(pinussilvestrus): make path configurable
 PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
@@ -123,7 +123,7 @@ function download_plugin {
 }
 
 # get args
-while getopts ":n:vh" optname
+while getopts ":n:vhl" optname
   do
     case "$optname" in
       "v")
@@ -132,6 +132,12 @@ while getopts ":n:vh" optname
         ;;
       "h")
         print_message "$USAGE"
+        exit 0;
+        ;;
+      "l")
+        print_message "Installed plugins:"
+        plugins_path=$(get_plugins_path)
+        ls --format=single-column "$plugins_path"
         exit 0;
         ;;
       "n")

@@ -16,12 +16,17 @@ cd mopl/
 ## Usage
 
 ```sh
-bin/mopl -h
-# [mopl] Usage: mopl -hv
-```
+# [mopl] Usage: mopl -hvnl
+mopl -h
 
-```sh
-bin/mopl -n bpmn-js-token-simulation-plugin
+# list installed plugins
+mopl -l
+
+# install from registry
+mopl
+
+# install specific plugin
+mopl -n bpmn-js-token-simulation-plugin 
 ```
 
 ## Additional Resources
