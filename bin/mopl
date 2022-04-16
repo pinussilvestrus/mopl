@@ -3,12 +3,12 @@
 #title           :mopl
 #description     :Easily install Camunda Desktop Modeler plugins.
 #author          :Niklas Kiefer
-#usage           :mopl -hvnl
+#usage           :mopl -hvnlo
 #bash-version    :Bash v4
 # ------------------------------------------------------------------
 
 VERSION=0.1.0
-USAGE="Usage: mopl -hvnl"
+USAGE="Usage: mopl -hvnlo"
 
 # TODO(pinussilvestrus): make path configurable
 PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
@@ -127,13 +127,21 @@ function select_plugin {
 function download_plugin {
   print_message "Downloading from ${opt}/tarball/master..."
   plugin_download_url="${1}/tarball/master"
-  plugins_path=$(get_plugins_path)
+
+  local plugins_path
+  if [[ -v arg_output_path ]]; then
+    plugins_path="$arg_output_path"
+  else
+    plugins_path=$(get_plugins_path)
+  fi
+
+  print_message "Extract to $plugins_path"
   curl --silent -L "${plugin_download_url}" | tar zx -C "$plugins_path"
   print_message "Success!"
 }
 
 # get args
-while getopts ":n:vhl" optname
+while getopts ":n:o:vhl" optname
   do
     case "$optname" in
       "v")
@@ -152,6 +160,9 @@ while getopts ":n:vhl" optname
         ;;
       "n")
         arg_plugin_name=$OPTARG
+        ;;
+      "o")
+        arg_output_path=$OPTARG
         ;;
       "?")
         print_message "Unknown option $OPTARG"

@@ -16,7 +16,7 @@ cd mopl/
 ## Usage
 
 ```sh
-# [mopl] Usage: mopl -hvnl
+# [mopl] Usage: mopl -hvnlo
 mopl -h
 
 # list installed plugins
@@ -27,6 +27,9 @@ mopl
 
 # install specific plugin
 mopl -n bpmn-js-token-simulation-plugin 
+
+# install to specific directory
+mopl -o some/local/path 
 ```
 
 ## Additional Resources
