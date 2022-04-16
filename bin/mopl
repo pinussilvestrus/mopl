@@ -13,7 +13,9 @@ USAGE="Usage: mopl -hvnl"
 # TODO(pinussilvestrus): make path configurable
 PLUGINS_REPOSITORY='https://raw.githubusercontent.com/camunda/camunda-modeler-plugins/master/README.md'
 URL_REGEX='(https:\/\/.*?)\)'
-MD_LINK_REGEX='^\*(\s)*\[.*?\]\(((https:\/\/.*?)|.).*?\)'
+
+# example: * [Token Simulation Plugin](https://github.com/bpmn-io/bpmn-js-token-simulation-plugin) -
+MD_LINK_REGEX='^\*(\s)*\[.*?\]\(((https:\/\/.*?)|.).*?\)\s-'
 PLUGINS_BLACKLIST=('https://docs.camunda.io/docs/components/modeler/desktop-modeler/plugins/')
 
 set -Eeuo pipefail

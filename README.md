@@ -4,7 +4,7 @@ Easily install [Camunda Desktop Modeler plugins](https://github.com/camunda/camu
 
 ## Requirements
 
-* Bash 5
+* Bash 4
 
 ## Installation
 
