@@ -24,15 +24,17 @@ function print_message {
   echo "[mopl] $1"
 }
 
+function fail {
+  echo -e "[mopl] $*"
+  exit 1
+}
+
 # TODO(pinussilvestrus): also offer local plugins, as https://github.com/camunda/camunda-modeler-plugins/tree/master/camunda-transaction-boundaries-plugin
 function crawl_plugins {
   curl --silent "$PLUGINS_REPOSITORY" | grep -Eo "${MD_LINK_REGEX}"
 }
 
 function platform {
-  os
-  platform
-
   os=$(uname -s)
   case "$os" in
   Darwin)
@@ -40,6 +42,9 @@ function platform {
     ;;
   Linux)
     platform="linux"
+    ;;
+  MSYS_NT-10.0-22000)
+    platform="windows"
     ;;
   *)
     fail "Unknown OS: $os"
@@ -51,7 +56,7 @@ function platform {
 
 # TODO(pinussilvestrus): make cross platform
 function get_plugins_path {
-  platform_name="$(platform)"
+  platform_name=$(platform)
 
   case "$platform_name" in
   mac)
@@ -59,6 +64,9 @@ function get_plugins_path {
     ;;
   linux)
     echo "${HOME}/.config/camunda-modeler/resources/plugins"
+    ;;
+  windows)
+    echo "${APPDATA}/camunda-modeler/resources/plugins"
     ;;
   *)
     fail "Unknown platform: $platform_name"
