@@ -56,7 +56,7 @@ function get_plugins_path {
     echo "${HOME}/Library/Application Support/camunda-modeler/resources/plugins"
     ;;
   linux)
-    echo "${HOME}/.config"
+    echo "${HOME}/.config/camunda-modeler/resources/plugins"
     ;;
   *)
     fail "Unknown platform: $platform_name"
