@@ -155,7 +155,7 @@ while getopts ":n:o:vhl" optname
       "l")
         print_message "Installed plugins:"
         plugins_path=$(get_plugins_path)
-        ls --format=single-column "$plugins_path"
+        ls "$plugins_path"
         exit 0;
         ;;
       "n")
