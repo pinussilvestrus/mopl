@@ -1,6 +1,6 @@
 # mopl
 
-Easily install [Camunda Desktop Modeler plugins](https://github.com/camunda/camunda-modeler-plugins).
+mopl (***mo***deler ***pl***ugins) is a command line tool to easily install [Camunda Desktop Modeler plugins](https://github.com/camunda/camunda-modeler-plugins).
 
 ![Screenshot](./docs/screenshot.png)
 
