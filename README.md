@@ -15,6 +15,8 @@ git clone https://github.com/pinussilvestrus/mopl.git
 cd mopl/
 ```
 
+Hint: copy or link [the bash script](https://github.com/pinussilvestrus/mopl/tree/main/bin) depending on your needs.
+
 ## Usage
 
 ```sh
